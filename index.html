@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Year Countdown Using JavaScript | Nabin Bhatt</title>
+    <meta name="description"
+        content="The simple countdown timer that displays the number of days, hours, minutes, and seconds remaining until the new year 2023." />
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,800,900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0D47A1;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+}
+
+.overlay.act,
+.overlay.ive {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  z-index: 8;
+  background: rgba(0, 0, 0, 0.5);
+  transition: 0.5s;
+}
+
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3em;
+}
+
+.container h1 {
+  font-weight: 500;
+  color: #fff;
+  text-align: center;
+}
+
+#countdown {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2em;
+  /* background: rgba(255, 255, 255, 0.3); */
+  /* box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); */
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+#countdown .circle {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#countdown .circle svg {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  transform: rotate(270deg);
+}
+
+#countdown .circle svg circle {
+  width: 100%;
+  height: 100%;
+  fill: transparent;
+  stroke-width: 8;
+  stroke: #092c62;
+  stroke-linecap: round;
+  transform: translate(5px, 5px);
+}
+
+#countdown .circle svg circle:nth-child(2) {
+  stroke: var(--clr);
+  stroke-dasharray: 440;
+  stroke-dashoffset: 440;
+}
+
+#countdown div {
+  position: absolute;
+  text-align: center;
+  font-weight: 500;
+  color: #fff;
+  font-size: 1.5em;
+  line-height: 0.5em;
+}
+
+#countdown div span {
+  font-size: 0.35em;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* snowflakes */
+#snowflakes {
+  position: fixed;
+  top: -50%;
+  left: 0;
+  width: 150%;
+  height: 150%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+ion-icon[name="snow-outline"] {
+  color: #fff;
+  position: absolute;
+  top: -20px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(105vh);
+  }
+}
+
+/* social/share menu */
+.menu {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: flex-end;
+  margin: 0 1em 1em 0;
+  gap: 1em;
+  z-index: 9;
+}
+
+.menu #share {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+  cursor: pointer;
+  font-size: 1.75em;
+  transition: 1.25s;
+}
+
+.menu #social {
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  cursor: pointer;
+  font-size: 2em;
+  transition: 1.25s;
+}
+
+.menu li span {
+  text-transform: uppercase;
+  color:#fff;
+  text-align: center;
+}
+
+.menu.active #share {
+  transform: rotate(360deg);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15),
+  0 0 0 2px #333,
+  0 0 0 8px #fff;
+}
+
+.share-container {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-container {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: center;
+}
+
+.shareMenu {
+  flex-direction: row;
+}
+
+.socialMenu {
+  flex-direction: column;
+}
+
+.shareMenu,
+.socialMenu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shareMenu li {
+  padding: 0 0.75em 0 0;
+}
+
+.socialMenu li {
+  padding: 0 0 0.75em;
+}
+
+.shareMenu li,
+.socialMenu li {
+  list-style: none;
+  transition: 0.5s;
+  scale: 0;
+  transition-delay: calc(0.05s * var(--i));
+}
+
+.shareMenu.active li,
+.socialMenu.active li {
+  scale: 1;
+}
+
+.menu li a {
+  display: flex;
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-size: 1.5em;
+  color: var(--clr);
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+  transition: 0.5s;
+}
+
+.menu li:hover a {
+  font-size: 2em;
+  box-shadow: 0 0 0 2px var(--clr),
+  0 0 0 6px #fff;
+}
+
+@media screen and (max-width: 600px) {
+  #countdown .circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  #countdown .circle svg {
+    height: 100px;
+    width: 100px;
+  }
+
+  #countdown .circle svg circle {
+    cx: 45;
+    cy: 45;
+    r: 45;
+    stroke-width: 5;
+  }
+
+  #countdown div {
+    font-size: 1.25em;
+  }
+}
+    </style>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <h1 class="text">The New Year Is Coming Soon!</h1>
+        <div id="countdown">
+            <div class="circle" style="--clr: #ff4c4c;">
+                <svg>
+                    <circle cx="70" cy="70" r="70"></circle>
+                    <circle cx="70" cy="70" r="70" id="dd"></circle>
+                </svg>
+                <div id="days">000<br><span>Days</span></div>
+            </div>
+
+            <div class="circle" style="--clr: #ffd700;">
+                <svg>
+                    <circle cx="70" cy="70" r="70"></circle>
+                    <circle cx="70" cy="70" r="70" id="hh"></circle>
+                </svg>
+                <div id="hours">00<br><span>Hours</span></div>
+            </div>
+
+            <div class="circle" style="--clr: #ffc0cb;">
+                <svg>
+                    <circle cx="70" cy="70" r="70"></circle>
+                    <circle cx="70" cy="70" r="70" id="mm"></circle>
+                </svg>
+                <div id="minutes">00<br><span>Minutes</span></div>
+            </div>
+
+            <div class="circle" style="--clr: #b0e0e6;">
+                <svg>
+                    <circle cx="70" cy="70" r="70"></circle>
+                    <circle cx="70" cy="70" r="70" id="ss"></circle>
+                </svg>
+                <div id="seconds">00<br><span>Seconds</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- share/social menu -->
+    <div class="menu">
+        <div class="share-container">
+            <div id="share">
+                <ion-icon name="share-social"></ion-icon>
+            </div>
+            <ul class="shareMenu">
+                <li><span>share</span></li>
+                <li style="--i:0;--clr:#1877f2;">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=https://crllnkhoa.github.io/cd//" target="_blank" rel="nofollow noopener">
+                        <ion-icon name="logo-facebook"></ion-icon>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="social-container">
+            <div id="social">
+                <ion-icon name="help-outline"></ion-icon>
+            </div>
+            <ul class="socialMenu">
+                <li><span>Me</span></li>
+               
+                <li style="--i:1;--clr:#fd1d1d;">
+                    <a href="https://www.instagram.com/crl_lnkhoa" target="_blank">
+                        <ion-icon name="logo-instagram"></ion-icon>
+                    </a>
+                </li>
+                <li style="--i:2;--clr:#0077b5;">
+                    <a href="https://linkedin.com/in/" target="_blank">
+                        <ion-icon name="logo-linkedin"></ion-icon>
+                    </a>
+                </li>
+                <li style="--i:3;--clr:#333;">
+                    <a href="https://github.com/CRLLNKhoa" target="_blank">
+                        <ion-icon name="logo-github"></ion-icon>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <canvas id="snowflakes"></canvas>
+    <script>console.log("New Year Countdown Using JavaScript");
+console.log("I hope you guys like it :))");
+
+let days = document.getElementById('days');
+let hours = document.getElementById('hours');
+let minutes = document.getElementById('minutes');
+let seconds = document.getElementById('seconds');
+
+let dd = document.getElementById('dd');
+let hh = document.getElementById('hh');
+let mm = document.getElementById('mm');
+let ss = document.getElementById('ss');
+
+let countdown = document.getElementById("countdown");
+let wishDays = 27;
+
+let x = setInterval(function () {
+  let currentYear = new Date().getFullYear();
+  let newYear = new Date(`Jan 22, ${currentYear + 1} 00:00:00`);
+  let now = new Date().getTime();
+  let distance = newYear - now;
+
+  // time calculation
+  let d = Math.floor(distance / (1000 * 60 * 60 * 24));
+  let h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  let m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  let s = Math.floor((distance % (1000 * 60)) / (1000));
+
+  // output the result
+  days.innerHTML = d + "<br><span>Days</span>";
+  hours.innerHTML = h + "<br><span>Hours</span>";
+  minutes.innerHTML = m + "<br><span>Minutes</span>";
+  seconds.innerHTML = s + "<br><span>Seconds</span>";
+
+  // animate stroke
+  dd.style.strokeDashoffset = 440 - (440 * d) / 365;
+  hh.style.strokeDashoffset = 440 - (440 * h) / 24;
+  mm.style.strokeDashoffset = 440 - (440 * m) / 60;
+  ss.style.strokeDashoffset = 440 - (440 * s) / 60;
+
+  // if countdown is over, change the innerText of .text
+  if (distance < 0) {
+    document.querySelector('.text').innerText = `Happy New Year ${currentYear}`;
+  }
+}, 1000);
+
+// snowflakes
+const canvas = document.getElementById("snowflakes");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// snowflake colors
+const colors = ["#eee", "#ddd", "#ccc"];
+
+class SnowFlake {
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this.vx = 0;
+    this.vy = 0;
+    this.radius = 0;
+    this.color = "";
+    this.reset();
+  }
+
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = Math.random() - 0.5;
+    this.vy = Math.random() * 1 + 1;
+    this.radius = Math.random() * 1 + 1;
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+
+    if (this.y + this.radius > canvas.height) {
+      this.reset();
+    }
+  }
+}
+
+const snowflakes = [];
+
+// initial snowflakes
+for (let i = 0; i < 100; i++) {
+  snowflakes.push(new SnowFlake());
+}
+
+// animation loop
+function animate() {
+  requestAnimationFrame(animate);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  snowflakes.forEach((snowflake) => {
+    snowflake.draw();
+    snowflake.update();
+  });
+}
+
+animate();
+
+// snow flake
+function createFlake() {
+  const flake = document.createElement('ion-icon');
+  flake.setAttribute('name', 'snow-outline');
+  flake.style.left = Math.random() * window.innerWidth + 'px';
+  flake.style.animationDuration = Math.random() * 3 + 2 + 's'; // between 2 - 5 seconds
+  flake.style.opacity = Math.random();
+  flake.style.fontSize = Math.random() * 10 + 10 + 'px';
+  
+  document.body.appendChild(flake);
+  
+  setTimeout(() => {
+    flake.remove();
+  }, 5000)
+}
+
+setInterval(createFlake, 500);
+
+// help button
+let share = document.getElementById('share');
+let social = document.getElementById('social');
+
+let shareMenu = document.querySelector('.shareMenu');
+let socialMenu = document.querySelector('.socialMenu');
+
+let menu = document.querySelector('.menu');
+let overlay = document.querySelector('.overlay');
+
+share.onclick = function() {
+  shareMenu.classList.toggle('active');
+  overlay.classList.toggle('act');
+}
+
+social.onclick = function() {
+  socialMenu.classList.toggle('active');
+  overlay.classList.toggle('ive');
+}
+</script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+
+</html>
